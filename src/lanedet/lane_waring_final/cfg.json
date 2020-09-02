@@ -1,0 +1,22 @@
+{
+  "dataset": {
+    "resize_shape": [512,256],
+    "dataset_name": "Tusimple",
+    "batch_size": 8
+  },
+  "device": "cuda",
+  "model": {
+    "embed_dim":4,
+    "delta_v":0.5,
+    "delta_d":3.0,
+    "scale_lane_line":1.0,
+    "scale_var":1.0,
+    "scale_dist":1.0
+  },
+  "optim": {
+    "lr": 5e-3,
+    "momentum":0.9
+  },
+  "MAX_ITER": 50,
+  "val_stride": 2
+}

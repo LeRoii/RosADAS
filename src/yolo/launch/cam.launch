@@ -1,0 +1,8 @@
+<launch>
+
+    <param name = "yolo_class_name_file" type = "string" value = "/space/code/lane/src/cameracap/cfg/coco.names" />
+    <param name = "yolo_cfg_file" type = "string" value = "/space/code/lane/src/cameracap/cfg/yolov4.cfg" />
+    <param name = "yolo_weight" type = "string" value = "/space/code/lane/src/cameracap/cfg/yolov4.weights" />
+    <node name="adasyolo" pkg = "yolo" type = "yolo_node" output = "screen">
+    </node>
+</launch>

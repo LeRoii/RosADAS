@@ -1,0 +1,35 @@
+<launch>   
+<!-- -->
+    <param name="lanenet_weight" value="/space/code/lane/src/lanedet/lane_waring_final/experiments/exp1/exp1_best.pth" />
+    <param name="yolo_weight" value="/space/code/rosadas/src/yolo_detection/src/yolov3.weights" />
+    <param name="yolo_classname" value="/space/code/rosadas/src/yolo_detection/src/data/coco.names" />
+    <param name="yolo_cfg" value="/space/code/rosadas/src/yolo_detection/src/cfg/yolov3.cfg" />
+    <param name="lightdet_weight" value="/space/code/rosTSR/src/traffic_light_detection/src/model_1105_99.pkl" />
+    <param name="lightdet_classname" value="/space/code/rosTSR/src/traffic_light_detection/src/tf.names" />
+
+    <!--
+    <param name="lanenet_weight" value="/home/iairiv/code/model/exp1_best.pth" />
+    <param name="yolo_weight" value="/home/iairiv/code/yolo/src/yolo_detection/src/yolov3.weights" />
+    <param name="yolo_classname" value="/home/iairiv/code/yolo/src/yolo_detection/src/data/coco.names" />
+    <param name="yolo_cfg" value="/home/iairiv/code/yolo/src/yolo_detection/src/cfg/yolov3.cfg" />
+    <param name="lightdet_weight" value="/home/iairiv/code/roslightdet/src/traffic_light_detection/src/model_1105_99.pkl" />
+    <param name="lightdet_classname" value="/home/iairiv/code/roslightdet/src/traffic_light_detection/src/tf.names" />
+    -->
+
+
+    <!--
+    <node pkg="lanedet" name="videonode" type="videopub.py" output="screen">
+    </node>
+    -->
+
+
+    <node pkg="lanedet" name="lanedetnode" type="ros_yolo_lane_detect.py" output="screen">
+    </node>
+
+    <node pkg="yolo_detection" name="yolonode" type="yolo_det.py" output="screen">
+    </node>
+
+    <node pkg="traffic_light_detection" name="trafficlightnode" type="light_detect_UDP.py" output="screen">
+    </node>
+  
+  </launch> 

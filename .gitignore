@@ -1,0 +1,10 @@
+__pycache__/
+experiments/
+devel/
+build/
+*.png
+*.weights
+*.idea/
+*.avi
+*.bag
+*.pkl
