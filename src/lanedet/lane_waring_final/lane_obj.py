@@ -130,24 +130,26 @@ class Lane:
         else:
             self.detectedLaneAvailable = False
 
-    def init(self, detectedLane):
+    def init(self):
         if self.detectedLaneAvailable:
-            self.points = detectedLane.copy()
+            self.points = self.detectedLane.copy()
             self.isInit = True
             self.age = self.age+1
             self.detectedLostCnt = 0
+        else:
+            self.reset()
 
     def updateLanev2(self):
         self.detectedLaneDiff = 9999
         if self.detectedLaneAvailable:
             self.detectedLaneDiff = np.linalg.norm(self.points - self.detectedLane)
-            if self.detectedLaneDiff < 100:
-                self.points[:,0] = np.average([self.points[:,0], self.detectedLane[:,0]], axis=0, weights=[0.8,0.2])
+            if self.detectedLaneDiff < CFG.DETECTED_DIFF_THRESH:
+                self.points[:,0] = np.average([self.points[:,0], self.detectedLane[:,0]], axis=0, weights=[0.6,0.4])
                 self.detectedLostCnt = 0
             else:
                 self.detectedLostCnt += 1
-                if self.detectedLostCnt > 5:
-                    self.init(self.detectedLane)
+                if self.detectedLostCnt > 3:
+                    self.init()
                     return
             self.lostCnt = 0
             self.age = self.age+1

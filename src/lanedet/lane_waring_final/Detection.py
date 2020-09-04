@@ -235,7 +235,7 @@ class Detection(object):
             #print("3帧的情况：")
             #print(state)                           # state = 1：出现车道线检测不是很准的情况   state = 0：车道线检测较准确，运行正常
             #print("车距离两侧车道线的距离：")
-            #print(distance)
+            print('lane distance:', distance)
             dis_mid = (distance[0] - distance[1]) / 2
 
             mid_distances = self.mid_dis(Detection.mid_distances, dis_mid, state)  # 更新mid_distances表
@@ -250,11 +250,11 @@ class Detection(object):
 
             speed = self.cal_speed(mid_distances, Detection.derta_time)
             #print("速度：")
-            #print(speed)
+            print('car theta:', theta, 'car speed:',speed)
 
             time = self.cal_time(distance, theta, speed)
             #print("车驶离车道线的时间：")
-            #print(time)
+            print('tlc:',time)
 
             self.warningTimeDelay = (self.warningTimeDelay - 1) if self.warningTimeDelay > 0 else 0
             if (len(Detection.mid_distances) < 5):

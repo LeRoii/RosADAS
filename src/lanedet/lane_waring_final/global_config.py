@@ -66,12 +66,12 @@ __C.TEST.BATCH_SIZE = 2
 # Test options
 __C.POSTPROCESS = edict()
 
-# Set the post process connect components analysis min area threshold
-__C.POSTPROCESS.MIN_AREA_THRESHOLD = 270
-# Set the post process dbscan search radius threshold
-__C.POSTPROCESS.DBSCAN_EPS = 0.25
-# Set the post process dbscan min samples threshold
-__C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 180
+# # Set the post process connect components analysis min area threshold
+# __C.POSTPROCESS.MIN_AREA_THRESHOLD = 200
+# # Set the post process dbscan search radius threshold
+# __C.POSTPROCESS.DBSCAN_EPS = 0.2
+# # Set the post process dbscan min samples threshold
+# __C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 200
 
 # image vanish point
 # point grey
@@ -109,3 +109,12 @@ __C.CROP_IMG_Y = 0
 
 __C.LANE_START_Y = 700
 __C.LANE_END_Y = 1100
+
+__C.DETECTED_DIFF_THRESH = 500
+
+# Set the post process connect components analysis min area threshold
+__C.POSTPROCESS.MIN_AREA_THRESHOLD = 350
+# Set the post process dbscan search radius threshold
+__C.POSTPROCESS.DBSCAN_EPS = 0.15
+# Set the post process dbscan min samples threshold
+__C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 150

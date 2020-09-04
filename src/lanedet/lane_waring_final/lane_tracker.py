@@ -24,8 +24,21 @@ class LaneTracker:
         if len(detectedLanes) > 1:
             # sort first two lane
             sortedDetectedLane = sorted(detectedLanes[:2], key=(lambda x : x[5][0]))
-            self.detectedLeftLane = sortedDetectedLane[0]
-            self.detectedRightLane = sortedDetectedLane[1]
+            # self.detectedLeftLane = sortedDetectedLane[0]
+            # self.detectedRightLane = sortedDetectedLane[1]
+            dist = np.linalg.norm(sortedDetectedLane[0] - sortedDetectedLane[1])
+            print('left right detected dist:', dist)
+            if dist < CFG.DETECTED_DIFF_THRESH:
+                if sortedDetectedLane[0][5][0] < CFG.IMAGE_WIDTH/2:
+                    self.detectedLeftLane = sortedDetectedLane[0]
+                else:
+                    self.detectedRightLane = sortedDetectedLane[0]
+            else:
+                self.detectedLeftLane = sortedDetectedLane[0]
+                self.detectedRightLane = sortedDetectedLane[1]
+
+
+
 
         elif len(detectedLanes) > 0:
             # (detectedLeftLane = detectedLanes[0].copy()) if detectedLanes[0][0] < CFG.IMAGE_WIDTH/2 else (detectedRightLane = detectedLanes[0].copy())
@@ -39,10 +52,20 @@ class LaneTracker:
         self.rightlane.updateDetectedLane(self.detectedRightLane)
 
         if not self.leftlane.isInit:
-            self.leftlane.init(self.detectedLeftLane)
+            self.leftlane.init()
         if not self.rightlane.isInit:
-            self.rightlane.init(self.detectedRightLane)
+            self.rightlane.init()
 
         self.leftlane.updateLanev2()
         self.rightlane.updateLanev2()
+
+        dist = np.linalg.norm(self.leftlane.points - self.rightlane.points)
+        print('left right lane dist:', dist)
+        if dist < CFG.DETECTED_DIFF_THRESH:
+            if self.leftlane.age > self.rightlane.age:
+                self.rightlane.reset()
+            else:
+                self.leftlane.reset()
+            # self.leftlane.init()
+            # self.rightlane.init()
 

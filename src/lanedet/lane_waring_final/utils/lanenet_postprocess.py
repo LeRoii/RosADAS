@@ -348,7 +348,7 @@ class LaneNetPostProcessor(object):
 
         for lane_index, coords in enumerate(lane_coords):
             print('post process:coords size:{},y diff:{}'.format(coords.size,abs(coords[:,1].max() - coords[:,1].min())))
-            if coords.size < 700 and abs(coords[:,1].max() - coords[:,1].min()) < 35: # mask points not enough, detected lane not long enough
+            if coords.size < 700 or abs(coords[:,1].max() - coords[:,1].min()) < 45: # mask points not enough, detected lane not long enough
                 continue
             coordsY = coords[:, 1] * CFG.CROP_IMG_HEIGHT / 256 + CFG.CROP_IMG_Y
             coordsX = coords[:, 0] * CFG.CROP_IMG_WIDTH / 512 + CFG.CROP_IMG_X
@@ -358,6 +358,8 @@ class LaneNetPostProcessor(object):
 
             fit_param = np.polyfit(coordsY, coordsX, 2)
             fit_params.append(fit_param)
+
+            # print('fit_param:', fit_param)
 
             lanePoints = np.zeros([12,2], dtype = int)
             lanePoints[:,1] = lanePointsY

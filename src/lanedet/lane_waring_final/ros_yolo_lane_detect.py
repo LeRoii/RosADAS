@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-# import xml.dom.minidom
 import cv2
 import sys
 import time
@@ -21,7 +20,6 @@ from utils.postprocess import *
 import torch.backends.cudnn as cudnn
 from utils.prob2lines import getLane
 from utils.lanenet_postprocess import LaneNetPostProcessor
-# import matplotlib.pyplot as plt
 from Detection import Detection
 
 from lane_obj import Lane
@@ -147,25 +145,10 @@ class Lane_warning:
             binary_seg_result=bin_seg_pred,
             instance_seg_result=embedding)
 
-        if postprocess_result['mask_image'] is None:
-            print('cant find any lane!!!')
-        else:
-            self.maskimg_pub.publish(self.bridge.cv2_to_imgmsg(postprocess_result['mask_image'], "bgr8"))
-            self.binimg_pub.publish(self.bridge.cv2_to_imgmsg(postprocess_result['binary_img'], "mono8"))
-            self.morphoimg_pub.publish(self.bridge.cv2_to_imgmsg(postprocess_result['morpho_img'], "mono8"))
-
         # cv2.imwrite(str(g_frameCnt)+'_mask.png', postprocess_result['mask_image'])
         # cv2.imwrite(str(g_frameCnt)+'_binary.png', postprocess_result['binary_img'])
 
         return postprocess_result
-
-
-    def color(self, signal):
-        if signal == 0:
-            color = (0, 255, 0)
-        else:
-            color = (0, 0, 255)
-        return color
 
     def process(self, frame):
         startt = time.time()
@@ -173,30 +156,12 @@ class Lane_warning:
         input_image = self.transform_input(cropImg)
         # startt = time.time()
         postProcResult = self.detection(input_image)
-        
-        # debugImg = frame.copy()
-        self.img = frame.copy()
-        # cv2.imwrite(str(g_frameCnt)+'.png', debugImg)
 
-        # if len(postProcResult['fit_params']) > 0:
-        #     self.leftlane.updateLane(postProcResult['fit_params'])
-        #     self.rightlane.updateLane(postProcResult['fit_params'])
-        #     if self.leftlane.detectedLostCnt > 3 and self.rightlane.detectedLostCnt > 3:
-        #         self.leftlane.initLane()
-        #         self.rightlane.initLane()
-        #         print('!!!!!!! detected not fit')
-        #     lanePoints = {
-        #         'lanes':[self.leftlane.points,self.rightlane.points]
-        #     }
-        #     signal = self.warning.detect(lanePoints)
-        #     color = (0, 0, 255) if signal == 1 else (0, 255, 0)
-        #     # color = (0, 255, 0)
-        #     #draw lane
-        #     for idx in range(11):
-        #         cv2.line(self.img, (int(self.leftlane.points[idx][0]), int(self.leftlane.points[idx][1])), (int(self.leftlane.points[idx+1][0]), int(self.leftlane.points[idx+1][1])), color, 10)
-        #         cv2.line(self.img, (int(self.rightlane.points[idx][0]), int(self.rightlane.points[idx][1])), (int(self.rightlane.points[idx+1][0]), int(self.rightlane.points[idx+1][1])), color, 10)
+        self.img = frame.copy()
+        # cv2.imwrite(str(g_frameCnt)+'.png', frame)
 
         self.tracker.process(postProcResult['detectedLanes'])
+
         llane = self.tracker.leftlane
         rlane = self.tracker.rightlane
 
@@ -209,47 +174,32 @@ class Lane_warning:
             cv2.line(self.img, (int(llane.points[idx][0]), int(llane.points[idx][1])), (int(llane.points[idx+1][0]), int(llane.points[idx+1][1])), color, 10)
             cv2.line(self.img, (int(rlane.points[idx][0]), int(rlane.points[idx][1])), (int(rlane.points[idx+1][0]), int(rlane.points[idx+1][1])), color, 10)
         
-        # for lane in postProcResult['detectedLanes']:
-        #     if lane[0][0] == llane.detectedLane[0][0]:
-        #         color = (255, 0, 0)
-        #     elif lane[0][0] == rlane.detectedLane[0][0]:
-        #         color = (255, 255, 0)
-        #     else:
-        #         color = (0,255,0)
+        #debug
+        debugImg = frame.copy()
+        for lane in postProcResult['detectedLanes']:
+            if lane[0][0] == llane.detectedLane[0][0]:
+                color = (255, 0, 0)
+            elif lane[0][0] == rlane.detectedLane[0][0]:
+                color = (255, 255, 0)
+            else:
+                color = (0,255,0)
 
-        #     for j in range(11):
-        #         cv2.line(debugImg, (lane[j][0], lane[j][1]), (lane[j+1][0], lane[j+1][1]), color, 10)
-        #         cv2.line(debugImg, (0,lane[j][1]), (int(self.image_X),lane[j][1]), (0,0,255), 3)
-        #         # cv2.putText(debugImg, '{}'.format(abs(int(fit_x[5])-960)), (int(fit_x[0]), int(plot_y[0])), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, thickness=2)
-        # cv2.imwrite(str(1)+'debug.png', debugImg)
+            for j in range(11):
+                cv2.line(debugImg, (lane[j][0], lane[j][1]), (lane[j+1][0], lane[j+1][1]), color, 10)
+                cv2.line(debugImg, (0,lane[j][1]), (int(self.image_X),lane[j][1]), (0,0,255), 3)
+                # cv2.putText(debugImg, '{}'.format(abs(int(fit_x[5])-960)), (int(fit_x[0]), int(plot_y[0])), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, thickness=2)
+        cv2.imwrite(str(1)+'debug.png', debugImg)
+
+        if postProcResult['mask_image'] is None:
+            print('cant find any lane!!!')
+        else:
+            self.maskimg_pub.publish(self.bridge.cv2_to_imgmsg(postProcResult['mask_image'], "bgr8"))
+            self.binimg_pub.publish(self.bridge.cv2_to_imgmsg(postProcResult['binary_img'], "mono8"))
+            self.morphoimg_pub.publish(self.bridge.cv2_to_imgmsg(postProcResult['morpho_img'], "mono8"))
+        #debug end
 
 
-
-        # debug
-        # plot_y = np.linspace(CFG.LANE_START_Y, CFG.LANE_END_Y, 12)
-        # for fit_param in postProcResult['fit_params']:
-        #     fit_x = fit_param[0] * plot_y ** 2 + fit_param[1] * plot_y + fit_param[2]
-            
-        #     if self.leftlane.detectedLeftLane[0][0] == int(fit_x[0]):
-        #         color = (255,0,0)
-        #     elif self.leftlane.detectedRightLane[0][0] == int(fit_x[0]):
-        #         color = (255,255,0)
-        #     else:
-        #         color = (0,255,0)
-
-        #     for j in range(11):
-        #         cv2.line(debugImg, (int(fit_x[j]), int(plot_y[j])), (int(fit_x[j+1]), int(plot_y[j+1])), color, 10)
-        #         cv2.line(debugImg, (0,int(plot_y[j])), (int(self.image_X),int(plot_y[j])), (0,0,255), 3)
-        #     cv2.putText(debugImg, '{}'.format(abs(int(fit_x[5])-960)), (int(fit_x[0]), int(plot_y[0])), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, thickness=2)
-            
-        # cv2.imwrite(str(g_frameCnt)+'debug.png', debugImg)
-        # cv2.imwrite(str(g_frameCnt)+'input_image.png', frame)
-
-        # cv2.imwrite(str(1)+'debug.png', debugImg)
-        #cv2.imwrite(str(1)+'input_image.png', cropImg)
-        # debug end
-
-        print('all use：', time.time()-startt)
+        print('lanedet all use：', time.time()-startt)
 
     def drawYoloResult(self, data):
         for i in range(data.objNum):
@@ -294,7 +244,7 @@ def test():
     global g_videoPlay, g_keyboardinput, g_writevideo, g_frameCnt
     ic = Lane_warning()
     rospy.init_node("lanedetnode", anonymous=True)
-    cap = cv2.VideoCapture('/space/data/cxg/3.avi')
+    cap = cv2.VideoCapture('/space/data/cxg0903/ok/4.avi')
     ret, frame = cap.read()
     rate = rospy.Rate(10)
     rospy.loginfo('video frame cnt:%d', cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -308,7 +258,7 @@ def test():
     while not rospy.is_shutdown():
         while not g_videoPlay:
             time.sleep(1)
-            if g_keyboardinput == 's':
+            if g_keyboardinput == "'":
                 g_keyboardinput = ''
                 break
 
