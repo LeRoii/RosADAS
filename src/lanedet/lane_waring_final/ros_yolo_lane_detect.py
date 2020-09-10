@@ -27,6 +27,7 @@ from lane_tracker import LaneTracker
 
 from yolo_detection.msg import BoundingBox, BoundingBoxes
 import glob
+import playsound
 
 CFG = global_config.cfg
 
@@ -56,7 +57,7 @@ class Lane_warning:
         self.weights_file = rospy.get_param("lanenet_weight")
         self.CUDA = torch.cuda.is_available()
         self.postprocessor = LaneNetPostProcessor()
-        self.warning = Detection()
+        self.warningModule = Detection()
         self.band_width = 1.5
         self.image_X = CFG.IMAGE_WIDTH
         self.image_Y = CFG.IMAGE_HEIGHT
@@ -80,6 +81,8 @@ class Lane_warning:
         self.img = np.zeros([CFG.IMAGE_WIDTH, CFG.IMAGE_HEIGHT, 3],np.uint8)
         self.yoloBoxes = BoundingBoxes()
         self.trafficLightBoxes = BoundingBoxes()
+
+        self.warning = 0
 
     def callbackyolo(self, boxmsg):
         print('callbackyolo, boxes len:', boxmsg.objNum)
@@ -168,8 +171,13 @@ class Lane_warning:
         lanePoints = {
                 'lanes':[llane.points, rlane.points]
         }
-        signal = self.warning.detect(lanePoints)
-        color = (0, 0, 255) if signal == 1 else (0, 255, 0)
+        self.warning = self.warningModule.detect(lanePoints)
+        if self.warning == 1:
+            soundplayTh = threading.Thread(target=playWarningSound)
+            soundplayTh.start()
+        color = (0, 0, 255) if self.warning == 1 else (0, 255, 0)
+        # if signal == 1:
+        #     playsound.playsound('/space/warn.mp3')
         for idx in range(11):
             cv2.line(self.img, (int(llane.points[idx][0]), int(llane.points[idx][1])), (int(llane.points[idx+1][0]), int(llane.points[idx+1][1])), color, 10)
             cv2.line(self.img, (int(rlane.points[idx][0]), int(rlane.points[idx][1])), (int(rlane.points[idx+1][0]), int(rlane.points[idx+1][1])), color, 10)
@@ -240,6 +248,10 @@ def listenkeyboard():
             print('g_keyboardinput rrrrrr')
             g_writevideo = True
 
+def playWarningSound():
+    playsound.playsound('/space/warn.mp3')
+
+
 def test():
     global g_videoPlay, g_keyboardinput, g_writevideo, g_frameCnt
     ic = Lane_warning()
@@ -295,6 +307,7 @@ def evaluateImage(model, imagePath, outputRoot):
     subDirIdx = imagePath.find('.MP4')
     # imagePath[frameIdx+7:subDirIdx]
     outputPath = outputRoot + imagePath[frameIdx+7:subDirIdx] + '_' + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
+    # outputPath = outputRoot + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
     print('imagePath:',imagePath)
     print('outputpath:',outputPath)
     detectedImage = cv2.imread(imagePath)
@@ -322,7 +335,7 @@ def evaluateImage(model, imagePath, outputRoot):
 
     # detectedLanes = np.array(())
     # gtLanes = np.array(())
-    with open(labelPath, 'r') as f, open('/space/data/lane/ret_acc20_test.txt', 'a') as ret:
+    with open(labelPath, 'r') as f, open('/space/data/lane/testacc20.txt', 'a') as ret:
         lines = f.readlines()
         findMatch = 0
         if len(lines) == 0:
@@ -383,8 +396,8 @@ def evaluateImage(model, imagePath, outputRoot):
 
         print('acc:',tmp)
         if tmp > 0.96:
-            ret.write(imagePath+'\n')
             if curFN == 0:
+                ret.write(imagePath+'\n')
                 cv2.imwrite(outputPath, gtImage)
 
         fp += curFP
@@ -409,12 +422,13 @@ def evaluateImage(model, imagePath, outputRoot):
         
 
 
-def testImage():
+def evaluateImages():
     lanedet = Lane_warning()
-    imgs = glob.glob('/space/data/lane/culane/*.jpg')
+    imgs = glob.glob('/space/data/lane/dataset/*.jpg')
     rootPath = '/space/data/CUlane'
-    outputRoot = '/space/data/lane/culane/acc20_test/'
-    listImagePath = '/space/data/lane/culane/test.txt'
+    outputRoot = '/space/data/lane/22/'
+    # listImagePath = '/space/data/lane/culane/ok.txt'
+    listImagePath = '/space/data/CUlane/list/test.txt'
     print(imgs)
     print(float('-0.534045'))
     with open(listImagePath, 'r') as f:
@@ -422,6 +436,9 @@ def testImage():
         for line in lines:
             imagePath = rootPath + line[:-1]
             evaluateImage(lanedet, imagePath, outputRoot)
+
+    # for img in imgs:
+    #     evaluateImage(lanedet, img, outputRoot)
 
 def testOneFrame():
     lanedet = Lane_warning()
@@ -437,11 +454,11 @@ def testOneFrame():
         cv2.imwrite(str(i)+'bin.png', postProcResult['binary_img'])
 
 
-
 def main(args):
     ic = Lane_warning()
     rospy.init_node("lanedetnode", anonymous=True)
     rospy.loginfo('model init end')
+    
     rospy.spin()
 
 
@@ -449,6 +466,7 @@ if __name__ == "__main__":
     # main(sys.argv)
     test()
     # testOneFrame()
+    # evaluateImages()
 
 
 

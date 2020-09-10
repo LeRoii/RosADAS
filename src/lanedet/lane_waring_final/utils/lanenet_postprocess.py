@@ -164,7 +164,7 @@ class _LaneNetCluster(object):
         :param embedding_image_feats:
         :return:
         """
-        db = DBSCAN(eps=CFG.POSTPROCESS.DBSCAN_EPS, min_samples=CFG.POSTPROCESS.DBSCAN_MIN_SAMPLES)
+        db = DBSCAN(eps=CFG.POSTPROCESS.DBSCAN_EPS, min_samples=CFG.POSTPROCESS.DBSCAN_MIN_SAMPLES, n_jobs=-1)
         try:
             features = StandardScaler().fit_transform(embedding_image_feats)
             db.fit(features)

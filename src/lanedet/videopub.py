@@ -11,12 +11,12 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import glob
 
-videoPath = '/space/data/road/0826/light2.avi'
+videoPath = '/space/data/cxg0903/ok/4.avi'
 
 def pubVideo():
     rospy.init_node('videopub',anonymous = True)
     pub = rospy.Publisher('/wideangle/image_color', Image, queue_size = 1)
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(15)
     bridge = CvBridge()
     cap = cv2.VideoCapture(videoPath)
     ret, frame = cap.read()
@@ -78,7 +78,7 @@ def pubImg():
 
 if __name__ == '__main__':
     try:
-        # pubVideo()
-        pubImg()
+        pubVideo()
+        # pubImg()
     except rospy.ROSInterruptException:
         pass

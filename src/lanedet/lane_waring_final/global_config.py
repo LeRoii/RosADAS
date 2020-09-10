@@ -110,11 +110,46 @@ __C.CROP_IMG_Y = 0
 __C.LANE_START_Y = 700
 __C.LANE_END_Y = 1100
 
-__C.DETECTED_DIFF_THRESH = 500
+__C.DETECTED_DIFF_THRESH = 400
+
+# # Set the post process connect components analysis min area threshold
+# __C.POSTPROCESS.MIN_AREA_THRESHOLD = 350
+# # Set the post process dbscan search radius threshold
+# __C.POSTPROCESS.DBSCAN_EPS = 0.2
+# # Set the post process dbscan min samples threshold
+# __C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 100
 
 # Set the post process connect components analysis min area threshold
 __C.POSTPROCESS.MIN_AREA_THRESHOLD = 350
 # Set the post process dbscan search radius threshold
 __C.POSTPROCESS.DBSCAN_EPS = 0.15
 # Set the post process dbscan min samples threshold
-__C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 150
+__C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 300
+
+# culane
+# __C.IMAGE_WIDTH = 1640
+# __C.IMAGE_HEIGHT = 590
+
+# __C.CROP_IMG_WIDTH = 1640
+# __C.CROP_IMG_HEIGHT = 590
+# __C.CROP_IMG_X = 0
+# __C.CROP_IMG_Y = 0
+
+# __C.LANE_START_Y = 300
+# __C.LANE_END_Y = 580
+
+# __C.DETECTED_DIFF_THRESH = 400
+
+# # # Set the post process connect components analysis min area threshold
+# # __C.POSTPROCESS.MIN_AREA_THRESHOLD = 350
+# # # Set the post process dbscan search radius threshold
+# # __C.POSTPROCESS.DBSCAN_EPS = 0.2
+# # # Set the post process dbscan min samples threshold
+# # __C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 100
+
+# # Set the post process connect components analysis min area threshold
+# __C.POSTPROCESS.MIN_AREA_THRESHOLD = 350
+# # Set the post process dbscan search radius threshold
+# __C.POSTPROCESS.DBSCAN_EPS = 0.15
+# # Set the post process dbscan min samples threshold
+# __C.POSTPROCESS.DBSCAN_MIN_SAMPLES = 300
