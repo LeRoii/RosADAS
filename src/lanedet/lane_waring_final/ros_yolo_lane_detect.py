@@ -299,14 +299,15 @@ def cropRoi(img):
 
     return img[CFG.CROP_IMG_Y:CFG.CROP_IMG_Y+CFG.CROP_IMG_HEIGHT, CFG.CROP_IMG_X:CFG.CROP_IMG_X+CFG.CROP_IMG_WIDTH, :].copy()
 
-def evaluateImage(model, imagePath, outputRoot):
+def evaluateImage(model, imagePath, outputRoot, outputtxt):
     global tp, fp, fn
     # imagePath = os.path.join(imageDir,img)
     labelPath = imagePath[:-3]+'lines.txt'
     frameIdx = imagePath.find('frame')
     subDirIdx = imagePath.find('.MP4')
     # imagePath[frameIdx+7:subDirIdx]
-    outputPath = outputRoot + imagePath[frameIdx+7:subDirIdx] + '_' + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
+    # outputPath = outputRoot + imagePath[frameIdx+7:subDirIdx] + '_' + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
+    outputPath = outputRoot + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
     # outputPath = outputRoot + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
     print('imagePath:',imagePath)
     print('outputpath:',outputPath)
@@ -335,7 +336,7 @@ def evaluateImage(model, imagePath, outputRoot):
 
     # detectedLanes = np.array(())
     # gtLanes = np.array(())
-    with open(labelPath, 'r') as f, open('/space/data/lane/testacc20.txt', 'a') as ret:
+    with open(labelPath, 'r') as f, open(outputtxt, 'a') as ret, open('/space/data/lane/100no.txt', 'a') as retno:
         lines = f.readlines()
         findMatch = 0
         if len(lines) == 0:
@@ -390,15 +391,18 @@ def evaluateImage(model, imagePath, outputRoot):
 
         detectedLanes = np.array(detectedLanes)
         gtLanes = np.array(gtLanes)
-        tmp = np.sum(np.where(np.abs(detectedLanes - gtLanes) < 20, 1., 0.)) / gtLanes.size
+        tmp = np.sum(np.where(np.abs(detectedLanes - gtLanes) < 30, 1., 0.)) / gtLanes.size
         cv2.putText(gtImage, 'pixel wise accuracy:{}'.format(tmp), (60, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), thickness=2)
 
-
+        cv2.imwrite(outputPath, gtImage)
         print('acc:',tmp)
         if tmp > 0.96:
             if curFN == 0:
                 ret.write(imagePath+'\n')
-                cv2.imwrite(outputPath, gtImage)
+                
+        else:
+            retno.write(imagePath+'\n')
+                
 
         fp += curFP
         tp += curTP
@@ -424,21 +428,21 @@ def evaluateImage(model, imagePath, outputRoot):
 
 def evaluateImages():
     lanedet = Lane_warning()
-    imgs = glob.glob('/space/data/lane/dataset/*.jpg')
+    imgs = glob.glob('/space/data/lane/100/*.jpg')
     rootPath = '/space/data/CUlane'
-    outputRoot = '/space/data/lane/22/'
+    outputRoot = '/space/data/lane/100ret/'
     # listImagePath = '/space/data/lane/culane/ok.txt'
     listImagePath = '/space/data/CUlane/list/test.txt'
+    outputtxt = '/space/data/lane/100.txt'
     print(imgs)
-    print(float('-0.534045'))
-    with open(listImagePath, 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            imagePath = rootPath + line[:-1]
-            evaluateImage(lanedet, imagePath, outputRoot)
+    # with open(listImagePath, 'r') as f:
+    #     lines = f.readlines()
+    #     for line in lines:
+    #         imagePath = rootPath + line[:-1]
+    #         evaluateImage(lanedet, imagePath, outputRoot, outputtxt)
 
-    # for img in imgs:
-    #     evaluateImage(lanedet, img, outputRoot)
+    for img in imgs:
+        evaluateImage(lanedet, img, outputRoot, outputtxt)
 
 def testOneFrame():
     lanedet = Lane_warning()
@@ -464,9 +468,9 @@ def main(args):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    test()
+    # test()
     # testOneFrame()
-    # evaluateImages()
+    evaluateImages()
 
 
 

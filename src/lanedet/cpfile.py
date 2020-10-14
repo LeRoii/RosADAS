@@ -1,14 +1,39 @@
-import os 
+import os
+import random
+import glob
 
 def main():
-    with open('/space/data/lane/ret_acc20_test.txt', 'r') as f:
-        i = 0
-        for line in f.readlines():
-            srcImgPath = line[:-1]
+    # with open('/space/data/lane/finallist.txt', 'r') as f:
+    #     i = 0
+    #     # lines = f.readlines()
+    #     # pickedLines = random.sample(lines, 500)
+    #     for line in f.readlines():
+    #         # i = random.randint(0,10000)
+    #         srcImgPath = line[:-1]
+    #         srcLabelPath = srcImgPath[:-3] + 'lines.txt'
+    #         dstImgPath = '/space/data/lane/finaldataset/' + str(i) + '.jpg'
+    #         dstLabelPath = '/space/data/lane/finaldataset/' + str(i) + '.lines.txt'
+    #         i+=1
+
+    #         # print(srcImgPath)
+    #         # print(srcLabelPath)
+    #         # print(dstImgPath)
+    #         # print(dstLabelPath)
+    #         cmd = 'cp {} {}'.format(srcImgPath, dstImgPath)
+    #         os.system(cmd)
+    #         cmd = 'cp {} {}'.format(srcLabelPath, dstLabelPath)
+    #         os.system(cmd)
+
+    imgs = glob.glob('/space/data/lane/finaldataset/*.jpg')
+    pickedLines = random.sample(imgs, 100)
+    for line in pickedLines:
+            # i = random.randint(0,10000)
+            srcImgPath = line[:]
             srcLabelPath = srcImgPath[:-3] + 'lines.txt'
-            dstImgPath = '/space/data/lane/dataset/' + str(i) + '.jpg'
-            dstLabelPath = '/space/data/lane/dataset/' + str(i) + '.lines.txt'
-            i+=1
+            imgNum = srcImgPath[srcImgPath.rfind('/')+1:-4]
+            dstImgPath = '/space/data/lane/100/' + imgNum + '.jpg'
+            dstLabelPath = '/space/data/lane/100/' + imgNum + '.lines.txt'
+            # i+=1
 
             # print(srcImgPath)
             # print(srcLabelPath)
@@ -18,6 +43,7 @@ def main():
             os.system(cmd)
             cmd = 'cp {} {}'.format(srcLabelPath, dstLabelPath)
             os.system(cmd)
+
 
 
 if __name__ == "__main__":
