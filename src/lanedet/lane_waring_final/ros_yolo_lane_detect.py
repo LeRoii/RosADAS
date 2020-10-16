@@ -171,10 +171,10 @@ class Lane_warning:
         lanePoints = {
                 'lanes':[llane.points, rlane.points]
         }
-        self.warning = self.warningModule.detect(lanePoints)
-        if self.warning == 1:
-            soundplayTh = threading.Thread(target=playWarningSound)
-            soundplayTh.start()
+        # self.warning = self.warningModule.detect(lanePoints)
+        # if self.warning == 1:
+        #     soundplayTh = threading.Thread(target=playWarningSound)
+        #     soundplayTh.start()
         color = (0, 0, 255) if self.warning == 1 else (0, 255, 0)
         # if signal == 1:
         #     playsound.playsound('/space/warn.mp3')
@@ -204,6 +204,7 @@ class Lane_warning:
             self.maskimg_pub.publish(self.bridge.cv2_to_imgmsg(postProcResult['mask_image'], "bgr8"))
             self.binimg_pub.publish(self.bridge.cv2_to_imgmsg(postProcResult['binary_img'], "mono8"))
             self.morphoimg_pub.publish(self.bridge.cv2_to_imgmsg(postProcResult['morpho_img'], "mono8"))
+            self.image_pub.publish(self.bridge.cv2_to_imgmsg(self.img, "bgr8"))
         #debug end
 
 
@@ -307,7 +308,7 @@ def evaluateImage(model, imagePath, outputRoot, outputtxt):
     subDirIdx = imagePath.find('.MP4')
     # imagePath[frameIdx+7:subDirIdx]
     # outputPath = outputRoot + imagePath[frameIdx+7:subDirIdx] + '_' + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
-    outputPath = outputRoot + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
+    outputPath = outputRoot + imagePath[imagePath.rfind('/')+1:-4]# + '_result.png'
     # outputPath = outputRoot + imagePath[imagePath.rfind('/')+1:-4] + '_result.png'
     print('imagePath:',imagePath)
     print('outputpath:',outputPath)
@@ -382,7 +383,7 @@ def evaluateImage(model, imagePath, outputRoot, outputtxt):
                 curFN += 1
 
             for i in range(len(lane)-1):
-                cv2.line(gtImage, (lane[i][0], lane[i][1]), (lane[i+1][0], lane[i+1][1]), (0, 255, 0), 2)
+                #cv2.line(gtImage, (lane[i][0], lane[i][1]), (lane[i+1][0], lane[i+1][1]), (0, 255, 0), 2)
                 cv2.line(grayGtImg, (lane[i][0], lane[i][1]), (lane[i+1][0], lane[i+1][1]), (1), 2)
         
         curTP = findMatch
@@ -392,9 +393,11 @@ def evaluateImage(model, imagePath, outputRoot, outputtxt):
         detectedLanes = np.array(detectedLanes)
         gtLanes = np.array(gtLanes)
         tmp = np.sum(np.where(np.abs(detectedLanes - gtLanes) < 30, 1., 0.)) / gtLanes.size
-        cv2.putText(gtImage, 'pixel wise accuracy:{}'.format(tmp), (60, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), thickness=2)
+        #cv2.putText(gtImage, 'pixel wise accuracy:{}'.format(tmp), (60, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), thickness=2)
 
-        cv2.imwrite(outputPath, gtImage)
+        cv2.imwrite(outputPath + '_result.png', gtImage)
+        cv2.imwrite(outputPath + '_mask_result.png', postProcResult['mask_image'])
+        cv2.imwrite(outputPath + '_bin_result.png', postProcResult['binary_img'])
         print('acc:',tmp)
         if tmp > 0.96:
             if curFN == 0:
@@ -445,17 +448,42 @@ def evaluateImages():
         evaluateImage(lanedet, img, outputRoot, outputtxt)
 
 def testOneFrame():
+    rospy.init_node("lanedetnode", anonymous=True)
     lanedet = Lane_warning()
-    imgs = glob.glob('/space/code/rosadas/tmp/*.png')
+    imgs = glob.glob('/space/data/lane/final100/*.jpg')
     imgnum = len(imgs)
+    frame_pub = rospy.Publisher("oriframe", Image,queue_size = 1)
+
     for i in range(imgnum):
-        frame = cv2.imread(imgs[i])
+        print('i=',i)
+        oriFrame = cv2.imread(imgs[i])
+        frame = oriFrame.copy()
+
+        # lanedet.process(frame)
+        # lanedet.image_pub.publish(lanedet.bridge.cv2_to_imgmsg(lanedet.img, "bgr8"))
         cropImg = cropRoi(frame)
         input_image = lanedet.transform_input(cropImg)
         postProcResult = lanedet.detection(input_image)
-        cv2.imwrite(str(i)+'mask.png', postProcResult['mask_image'])
-        cv2.imwrite(str(i)+'morph.png', postProcResult['morpho_img'])
-        cv2.imwrite(str(i)+'bin.png', postProcResult['binary_img'])
+        lanedet.tracker.process(postProcResult['detectedLanes'])
+        llane = lanedet.tracker.detectedLeftLane
+        rlane = lanedet.tracker.detectedRightLane
+
+        for idx in range(11):
+            cv2.line(frame, (int(llane[idx][0]), int(llane[idx][1])), (int(llane[idx+1][0]), int(llane[idx+1][1])), (0,255,0), 7)
+            cv2.line(frame, (int(rlane[idx][0]), int(rlane[idx][1])), (int(rlane[idx+1][0]), int(rlane[idx+1][1])), (0,255,0), 7)
+
+        lanedet.maskimg_pub.publish(lanedet.bridge.cv2_to_imgmsg(postProcResult['mask_image'], "bgr8"))
+        lanedet.binimg_pub.publish(lanedet.bridge.cv2_to_imgmsg(postProcResult['binary_img'], "mono8"))
+        lanedet.image_pub.publish(lanedet.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        frame_pub.publish(lanedet.bridge.cv2_to_imgmsg(oriFrame, "bgr8"))
+
+        # cv2.imwrite(str(i)+'mask.png', lanedet.postProcResult['mask_image'])
+        # cv2.imwrite(str(i)+'morph.png', postProcResult['morpho_img'])
+        # cv2.imwrite(str(i)+'bin.png', lanedet.postProcResult['binary_img'])
+        outputpath = '/space/data/lane/final100ret/' + imgs[i][imgs[i].rfind('/')+1:]
+        cv2.imwrite(outputpath, frame)
+
+        # time.sleep(3)
 
 
 def main(args):
@@ -469,8 +497,8 @@ def main(args):
 if __name__ == "__main__":
     # main(sys.argv)
     # test()
-    # testOneFrame()
-    evaluateImages()
+    testOneFrame()
+    # evaluateImages()
 
 
 

@@ -24,16 +24,17 @@ def main():
     #         cmd = 'cp {} {}'.format(srcLabelPath, dstLabelPath)
     #         os.system(cmd)
 
-    imgs = glob.glob('/space/data/lane/finaldataset/*.jpg')
+    imgs = glob.glob('/space/data/lane/daystraight/*.jpg')
     pickedLines = random.sample(imgs, 100)
+    i=1
     for line in pickedLines:
             # i = random.randint(0,10000)
             srcImgPath = line[:]
             srcLabelPath = srcImgPath[:-3] + 'lines.txt'
             imgNum = srcImgPath[srcImgPath.rfind('/')+1:-4]
-            dstImgPath = '/space/data/lane/100/' + imgNum + '.jpg'
-            dstLabelPath = '/space/data/lane/100/' + imgNum + '.lines.txt'
-            # i+=1
+            dstImgPath = '/space/data/lane/final100/' + str(i) + '.jpg'
+            dstLabelPath = '/space/data/lane/final100/' + str(i) + '.lines.txt'
+            i+=1
 
             # print(srcImgPath)
             # print(srcLabelPath)
