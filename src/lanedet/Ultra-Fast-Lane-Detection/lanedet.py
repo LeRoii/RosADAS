@@ -71,6 +71,8 @@ class LaneDetect:
         loc[out_j == CFG.griding_num] = 0
         out_j = loc
 
+        detectedPoints = []
+
         for i in range(out_j.shape[1]):
             if np.sum(out_j[:, i] != 0) > 2:
                 x = []
@@ -81,6 +83,7 @@ class LaneDetect:
                         # cv2.circle(img,ppp,5,(0,255,0),-1)
                         x.append(ppp[0])
                         y.append(ppp[1])
+                        detectedPoints.append(ppp)
 
                 x = np.array(x)
                 y = np.array(y)
@@ -97,5 +100,10 @@ class LaneDetect:
                 lanePoints[:,0] = lanePointsX.astype(np.int)
                 detectedLanes.append(lanePoints)
 
-        return detectedLanes
+        ret = {
+                'detectedlanes':detectedLanes,
+                'detectedPoints':detectedPoints
+        }
+
+        return ret
         

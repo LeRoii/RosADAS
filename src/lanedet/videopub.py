@@ -25,9 +25,11 @@ def pubVideo():
     
     while not rospy.is_shutdown():
         ret, frame = cap.read()
+
         if not ret:
             rospy.loginfo('frame end')
-            break
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue
         pub.publish(bridge.cv2_to_imgmsg(frame,"bgr8"))
         rospy.loginfo('frame cnt:%d', cnt)
         cnt = cnt+1

@@ -24,6 +24,8 @@ class adasDetector:
         self.trafficLightBoxes = BoundingBoxes()
         self.ldw_inst = laneDepartureWarning()
         self.image_pub = rospy.Publisher("adasresult", Image,queue_size = 1)
+        self.networkret_pub = rospy.Publisher("networkret", Image,queue_size = 1)
+
         self.img = np.zeros([CFG.imgWidth, CFG.imgHeight, 3],np.uint8)
         self.bridge = CvBridge()
 
@@ -81,7 +83,11 @@ class adasDetector:
         self.drawYoloResult(self.yoloBoxes)
         self.drawYoloResult(self.trafficLightBoxes)
 
-        self.image_pub.publish(self.bridge.cv2_to_imgmsg(self.img, "bgr8"))
+        for pt in ret['detectedPoints']:
+            cv2.circle(cv_image,pt,9,(0,255,0),-1)
+            # cv2.circle(self.img,pt,9,(0,255,0),-1)
 
+        self.image_pub.publish(self.bridge.cv2_to_imgmsg(self.img, "bgr8"))
+        self.networkret_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
         
         pass

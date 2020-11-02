@@ -15,7 +15,8 @@ class laneDepartureWarning:
         self.warning = LaneWarning()
 
     def process(self, img):
-        detectedLanes = self.detection.process(img)
+        detRet = self.detection.process(img)
+        detectedLanes = detRet['detectedlanes']
         self.tracker.process(detectedLanes)
         llane = self.tracker.leftlane
         rlane = self.tracker.rightlane
@@ -39,7 +40,8 @@ class laneDepartureWarning:
         ret = {
             'leftlane':llane,
             'rightlane':rlane,
-            'warningret':warningret
+            'warningret':warningret,
+            'detectedPoints':detRet['detectedPoints']
         }
 
         return ret

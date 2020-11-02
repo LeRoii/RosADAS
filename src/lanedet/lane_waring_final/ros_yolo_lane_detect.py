@@ -497,8 +497,8 @@ def main(args):
 if __name__ == "__main__":
     # main(sys.argv)
     # test()
-    testOneFrame()
-    # evaluateImages()
+    # testOneFrame()
+    evaluateImages()
 
 
 
