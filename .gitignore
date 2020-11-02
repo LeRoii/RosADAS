@@ -8,3 +8,4 @@ build/
 *.avi
 *.bag
 *.pkl
+*.pyc

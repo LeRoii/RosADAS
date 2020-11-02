@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*- 
 import sys
-sys.path.append("/home/iairiv/code/adas0903/src/lanedet/Ultra-Fast-Lane-Detection/")
-print(sys.path)
+#sys.path.append("/home/iairiv/code/adas0903/src/lanedet/Ultra-Fast-Lane-Detection/")
+#print(sys.path)
 
 # import configs.testconfig
-# from configs import testconfig
-import testconfig
+from configs import testconfig
 from model.model import parsingNet
 import torch
 import torchvision.transforms as transforms

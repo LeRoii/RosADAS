@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*- 
 
 import rospy
@@ -6,7 +6,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 import playsound
 import sys
-sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+#sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 
 import numpy as np
 import cv2
@@ -130,8 +130,6 @@ def main():
     rospy.spin()
 
 
-
-
 if __name__ == "__main__":
-    main()
-    # testVideo()
+    # main()
+    testVideo()
