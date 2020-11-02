@@ -431,9 +431,9 @@ def evaluateImage(model, imagePath, outputRoot, outputtxt):
 
 def evaluateImages():
     lanedet = Lane_warning()
-    imgs = glob.glob('/space/data/lane/100/*.jpg')
+    imgs = glob.glob('/space/data/lane/final100/*.jpg')
     rootPath = '/space/data/CUlane'
-    outputRoot = '/space/data/lane/100ret/'
+    outputRoot = '/space/data/lane/1102_100ret/'
     # listImagePath = '/space/data/lane/culane/ok.txt'
     listImagePath = '/space/data/CUlane/list/test.txt'
     outputtxt = '/space/data/lane/100.txt'
@@ -455,7 +455,7 @@ def testOneFrame():
     frame_pub = rospy.Publisher("oriframe", Image,queue_size = 1)
 
     for i in range(imgnum):
-        print('i=',i)
+        print('************\nframe count:',i,'************\n')
         oriFrame = cv2.imread(imgs[i])
         frame = oriFrame.copy()
 
@@ -483,7 +483,7 @@ def testOneFrame():
         outputpath = '/space/data/lane/final100ret/' + imgs[i][imgs[i].rfind('/')+1:]
         cv2.imwrite(outputpath, frame)
 
-        # time.sleep(3)
+        time.sleep(3)
 
 
 def main(args):
@@ -497,8 +497,8 @@ def main(args):
 if __name__ == "__main__":
     # main(sys.argv)
     # test()
-    # testOneFrame()
-    evaluateImages()
+    testOneFrame()
+    # evaluateImages()
 
 
 
