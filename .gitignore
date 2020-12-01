@@ -9,3 +9,4 @@ build/
 *.bag
 *.pkl
 *.pyc
+.vscode/

@@ -11,12 +11,12 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import glob
 
-videoPath = '/space/data/cxg0903/ok/4.avi'
+videoPath = '/space/data/road/1.avi'
 
 def pubVideo():
     rospy.init_node('videopub',anonymous = True)
-    pub = rospy.Publisher('/wideangle/image_color', Image, queue_size = 1)
-    rate = rospy.Rate(15)
+    pub = rospy.Publisher('zed', Image, queue_size = 1)
+    rate = rospy.Rate(30)
     bridge = CvBridge()
     cap = cv2.VideoCapture(videoPath)
     ret, frame = cap.read()
