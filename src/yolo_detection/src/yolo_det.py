@@ -30,7 +30,8 @@ class YOLO_detection:
         # self.result = rospy.Publisher('YOLO_detect_result', Float64MultiArray, queue_size=10)
         self.bridge = CvBridge()
         #self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback)
-        self.image_sub = rospy.Subscriber("/wideangle/image_color", Image, self.callback)
+        # self.image_sub = rospy.Subscriber("/wideangle/image_color", Image, self.callback)
+        self.image_sub = rospy.Subscriber('/cam_front/csi_cam/image_raw', Image, self.callback)
         self.batch_size = 1
         self.reso = 416
         self.confidence = 0.5
@@ -48,9 +49,9 @@ class YOLO_detection:
         # self.cfg_file = "/space/code/rosadas/src/yolo_detection/src/cfg/yolov3.cfg"
         # self.weights_file = "/space/code/rosadas/src/yolo_detection/src/yolov3.weights"
 
-        self.classes = load_classes(rospy.get_param("yolo_classname"))
-        self.cfg_file = rospy.get_param("yolo_cfg")
-        self.weights_file = rospy.get_param("yolo_weight")
+        self.classes = load_classes(rospy.get_param("yolo_classname", "/space/code/rosadas/src/yolo_detection/src/data/coco.names" ))
+        self.cfg_file = rospy.get_param("yolo_cfg","/space/code/rosadas/src/yolo_detection/src/cfg/yolov3.cfg")
+        self.weights_file = rospy.get_param("yolo_weight","/space/code/rosadas/src/yolo_detection/src/yolov3.weights")
 
         self.model = Darknet(self.cfg_file)
         self.model.load_weights(self.weights_file)

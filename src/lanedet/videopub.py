@@ -44,7 +44,7 @@ def pubVideo():
 
 
 def pubImg():
-    image_paths = glob.glob('/space/data/cxg/3/*.jpg')
+    image_paths = glob.glob('/space/code/calibration/image/*.jpg')
     image_paths.sort()
     print(image_paths)
 
@@ -66,21 +66,22 @@ def pubImg():
         # image = cv2.resize(image,(1280,720))
         # cv2.imshow("lala",image)
         # cv2.waitKey(0)
-        i = i+1
-
+        
         
         
         pub.publish(bridge.cv2_to_imgmsg(image,"bgr8"))
         rospy.loginfo('frame cnt:%d, img name:%s', i, image_paths[i])
         #cnt = cnt+1
-        # cv2.imshow("lala",image)
-        # cv2.waitKey(0)
+        cv2.imshow("lala",image)
+        cv2.waitKey(0)
+        i = i+1
+
         rate.sleep()
 
 
 if __name__ == '__main__':
     try:
-        pubVideo()
-        # pubImg()
+        # pubVideo()
+        pubImg()
     except rospy.ROSInterruptException:
         pass

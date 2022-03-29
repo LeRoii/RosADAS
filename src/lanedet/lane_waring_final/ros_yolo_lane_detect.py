@@ -450,7 +450,7 @@ def evaluateImages():
 def testOneFrame():
     rospy.init_node("lanedetnode", anonymous=True)
     lanedet = Lane_warning()
-    imgs = glob.glob('/space/data/lane/final100/*.jpg')
+    imgs = glob.glob('/space/data/lane/finaldataset/*.jpg')
     imgnum = len(imgs)
     frame_pub = rospy.Publisher("oriframe", Image,queue_size = 1)
 
@@ -472,18 +472,18 @@ def testOneFrame():
             cv2.line(frame, (int(llane[idx][0]), int(llane[idx][1])), (int(llane[idx+1][0]), int(llane[idx+1][1])), (0,255,0), 7)
             cv2.line(frame, (int(rlane[idx][0]), int(rlane[idx][1])), (int(rlane[idx+1][0]), int(rlane[idx+1][1])), (0,255,0), 7)
 
-        lanedet.maskimg_pub.publish(lanedet.bridge.cv2_to_imgmsg(postProcResult['mask_image'], "bgr8"))
-        lanedet.binimg_pub.publish(lanedet.bridge.cv2_to_imgmsg(postProcResult['binary_img'], "mono8"))
-        lanedet.image_pub.publish(lanedet.bridge.cv2_to_imgmsg(frame, "bgr8"))
-        frame_pub.publish(lanedet.bridge.cv2_to_imgmsg(oriFrame, "bgr8"))
+        #lanedet.maskimg_pub.publish(lanedet.bridge.cv2_to_imgmsg(postProcResult['mask_image'], "bgr8"))
+        #lanedet.binimg_pub.publish(lanedet.bridge.cv2_to_imgmsg(postProcResult['binary_img'], "mono8"))
+        #lanedet.image_pub.publish(lanedet.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        #frame_pub.publish(lanedet.bridge.cv2_to_imgmsg(oriFrame, "bgr8"))
 
         # cv2.imwrite(str(i)+'mask.png', lanedet.postProcResult['mask_image'])
         # cv2.imwrite(str(i)+'morph.png', postProcResult['morpho_img'])
         # cv2.imwrite(str(i)+'bin.png', lanedet.postProcResult['binary_img'])
-        outputpath = '/space/data/lane/final100ret/' + imgs[i][imgs[i].rfind('/')+1:]
+        outputpath = '/space/data/lane/finaldatasetret/' + imgs[i][imgs[i].rfind('/')+1:]
         cv2.imwrite(outputpath, frame)
 
-        time.sleep(3)
+        # time.sleep(3)
 
 
 def main(args):
