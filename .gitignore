@@ -5,7 +5,7 @@ build/
 *.png
 *.weights
 *.idea/
-*.avi
+#*.avi
 *.bag
 *.pkl
 *.pyc
